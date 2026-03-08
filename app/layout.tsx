@@ -8,7 +8,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "Mira Browser",
-  description: "A fast, customizable desktop browser built with Electron and React.",
+  description: "An open source desktop browser that helps you get everything done.",
 };
 
 export default function RootLayout({
