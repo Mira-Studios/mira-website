@@ -89,6 +89,7 @@ export default function RootLayout({
                 <Link href="/downloads">Downloads</Link>
                 <Link href="/themes">Themes</Link>
                 <Link href="/privacy">Privacy</Link>
+                <Link href="/terms">Terms</Link>
                 <a href="https://github.com/FatalMistake02/mira" target="_blank" rel="noreferrer">
                   GitHub
                 </a>
