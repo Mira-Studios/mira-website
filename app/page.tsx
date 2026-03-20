@@ -18,7 +18,7 @@ const highlights = [
   },
   {
     title: "Efficiency",
-    text: "Mira uses significantly less RAM than comparable browsers.",
+    text: "Mira is designed to use memory efficiently during everyday browsing.",
   },
   {
     title: "Built to Evolve",
