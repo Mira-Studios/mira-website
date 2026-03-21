@@ -386,8 +386,7 @@ h2 {
   gap: 1.5rem;
   padding: 1.4rem 1.6rem;
   margin-bottom: 1rem;
-  border-width: 2px;
-  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+  border: 2px solid color-mix(in srgb, var(--primary) 35%, var(--line));
   background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 18%, var(--surface)) 0%, var(--surface) 65%);
 }
 
@@ -431,7 +430,7 @@ h2 {
 
 .download-card.inapplicable:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 17px rgb(2 6 23 / 0.08); 
+  box-shadow: 0 8px 17px rgb(2 6 23 / 0.08);
   border-color: color-mix(in srgb, var(--line) 75%, var(--primary));
 
 }
