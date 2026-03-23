@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { PrereleaseToggle } from "./prerelease-toggle";
 import { DownloadCards } from "./download-cards";
-import { UpdateBanner } from "./update-banner";
 import { compareSemver, parseSemver, type ParsedSemver } from "./semver";
 import { getSiteUrl } from "@/lib/site-url";
 
