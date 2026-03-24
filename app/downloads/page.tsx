@@ -279,6 +279,28 @@ function formatDate(iso: string): string {
   });
 }
 
+function selectRelease(allReleases: GitHubRelease[], userIncludePrereleases: boolean) {
+  const stableReleases = allReleases.filter((release) => !release.prerelease);
+  const hasStableLatest = stableReleases.length > 0;
+  const effectiveIncludePrereleases = userIncludePrereleases || !hasStableLatest;
+  const candidateReleases = effectiveIncludePrereleases ? allReleases : stableReleases;
+  const fallbackRelease = candidateReleases[0] ?? null;
+  const updateRelease = getLatestReleaseBySemver(candidateReleases) ?? fallbackRelease;
+  const selectedRelease = updateRelease ?? fallbackRelease;
+  const shouldNoindex = selectedRelease?.prerelease ?? effectiveIncludePrereleases;
+
+  return {
+    stableReleases,
+    hasStableLatest,
+    effectiveIncludePrereleases,
+    candidateReleases,
+    fallbackRelease,
+    updateRelease,
+    selectedRelease,
+    shouldNoindex,
+  };
+}
+
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -287,14 +309,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const resolvedSearchParams = (await searchParams) ?? {};
   const userIncludePrereleases = parseIncludePrereleases(resolvedSearchParams.includePrereleases);
   const allReleases = await fetchReleases();
-  const stableReleases = allReleases.filter((release) => !release.prerelease);
-  const hasStableLatest = stableReleases.length > 0;
-  const effectiveIncludePrereleases = userIncludePrereleases || !hasStableLatest;
-  const candidateReleases = effectiveIncludePrereleases ? allReleases : stableReleases;
-  const fallbackRelease = candidateReleases[0] ?? null;
-  const updateRelease = getLatestReleaseBySemver(candidateReleases) ?? fallbackRelease;
-  const selectedRelease = updateRelease ?? fallbackRelease;
-  const shouldNoindex = selectedRelease?.prerelease ?? userIncludePrereleases;
+  const { shouldNoindex } = selectRelease(allReleases, userIncludePrereleases);
   const canonicalPath = "/downloads";
 
   return {
@@ -333,15 +348,10 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
   const userIncludePrereleases = parseIncludePrereleases(resolvedSearchParams.includePrereleases);
 
   const allReleases = await fetchReleases();
-  const stableReleases = allReleases.filter((release) => !release.prerelease);
-
-  const hasStableLatest = stableReleases.length > 0;
-  const effectiveIncludePrereleases = userIncludePrereleases || !hasStableLatest;
-
-  const candidateReleases = effectiveIncludePrereleases ? allReleases : stableReleases;
-  const fallbackRelease = candidateReleases[0] ?? null;
-  const updateRelease = getLatestReleaseBySemver(candidateReleases) ?? fallbackRelease;
-  const selectedRelease = updateRelease ?? fallbackRelease;
+  const { hasStableLatest, effectiveIncludePrereleases, updateRelease, selectedRelease } = selectRelease(
+    allReleases,
+    userIncludePrereleases,
+  );
 
   const slots = selectedRelease ? buildDownloadSlots(selectedRelease) : null;
   const siteUrl = getSiteUrl();
