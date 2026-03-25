@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
+import { UpdateBanner } from "./downloads/update-banner";
+import { getLatestVersion } from "./lib/latest-version";
 import { UserMenu } from "@/components/auth/user-menu";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
@@ -11,6 +13,30 @@ export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "Mira Browser",
   description: "An open source desktop browser that helps you get everything done.",
+  keywords: [
+    "FatalMistake02",
+    "Fatal Mistake 02",
+    "Kolbe Tessarzik",
+    "kolbe-tessarzik",
+    "Mira",
+    "Browser",
+    "Mira Browser",
+    "efficient browser",
+    "open source browser",
+    "open-source browser",
+    "customizable browser",
+    "customizable themes",
+    "browser themes",
+    "themeable browser",
+    "desktop browser",
+    "Electron browser",
+    "React browser",
+    "MIT licensed browser",
+    "easy to use",
+    "ad blocker",
+    "ad-blocker",
+    "browser with ad blocker",
+  ],
 };
 
 export default async function RootLayout({
@@ -23,6 +49,7 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const latestVersion = await getLatestVersion();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -38,16 +65,19 @@ export default async function RootLayout({
         <div className="site-shell">
           <header className="site-header">
             <div className="container nav-wrap">
-              <Link href="/" className="brand" aria-label="Mira home">
-                <Image
-                  src="/assets/mira.png"
-                  alt="Mira"
-                  width={140}
-                  height={38}
-                  className="brand-image"
-                  priority
-                />
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Link href="/" className="brand" aria-label="Mira home">
+                  <Image
+                    src="/assets/mira.png"
+                    alt="Mira"
+                    width={140}
+                    height={38}
+                    className="brand-image"
+                    priority
+                  />
+                </Link>
+                <UpdateBanner latestVersion={latestVersion} settingsUrl="mira://Updates" compact />
+              </div>
               <div className="nav-controls">
                 <nav className="nav-links" aria-label="Primary">
                   <Link href="/">Home</Link>
