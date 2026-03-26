@@ -26,27 +26,12 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Check if this is an admin route
+  // For admin routes, just check if user is logged in
+  // Admin verification will happen on the page itself
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
-
-      // Check if user is admin
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("is_admin")
-        .eq("id", user.id)
-        .single();
-
-      if (error || !profile?.is_admin) {
-        return NextResponse.redirect(new URL("/", request.url));
-      }
-    } catch (err) {
-      console.error("Admin check failed:", err);
+    if (!user) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
