@@ -18,20 +18,9 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          // Create a new response with the cookies
-          const newResponse = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
-          
-          // Copy cookies to the new response
           cookiesToSet.forEach(({ name, value, options }) => {
-            newResponse.cookies.set(name, value, options);
+            response.cookies.set(name, value, options);
           });
-          
-          // Update our mutable reference
-          response = newResponse;
         },
       },
     }
@@ -39,20 +28,25 @@ export async function middleware(request: NextRequest) {
 
   // Check if this is an admin route
   if (request.nextUrl.pathname.startsWith("/admin")) {
-    const { data: { user } } = await supabase.auth.getUser();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+      if (!user) {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
 
-    // Check if user is admin
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("is_admin")
-      .eq("id", user.id)
-      .single();
+      // Check if user is admin
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
 
-    if (!profile?.is_admin) {
+      if (error || !profile?.is_admin) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    } catch (err) {
+      console.error("Admin check failed:", err);
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
