@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore, useState } from "react";
+import { Sun, Moon } from "lucide-react";
 
 type Theme = "light" | "dark";
 
@@ -64,6 +65,8 @@ export function ThemeToggle() {
     () => false,
   );
 
+  const [isAnimating, setIsAnimating] = useState(false);
+
   useEffect(() => {
     if (storedTheme) {
       document.documentElement.dataset.theme = storedTheme;
@@ -76,24 +79,32 @@ export function ThemeToggle() {
   const effectiveTheme: Theme = storedTheme ?? (systemPrefersDark ? "dark" : "light");
 
   function toggleTheme() {
+    setIsAnimating(true);
     const nextTheme: Theme = effectiveTheme === "dark" ? "light" : "dark";
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
     window.dispatchEvent(new Event(THEME_EVENT));
+    setTimeout(() => setIsAnimating(false), 400);
   }
 
   return (
     <button
       type="button"
-      role="switch"
-      aria-checked={effectiveTheme === "dark"}
-      aria-label="Toggle dark mode"
-      className={`theme-toggle ${effectiveTheme === "dark" ? "on" : "off"}`}
+      aria-label={effectiveTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className={`theme-icon-toggle ${isAnimating ? "animating" : ""}`}
       onClick={toggleTheme}
     >
-      <span className="theme-toggle-label">Dark mode</span>
-      <span className="theme-toggle-track">
-        <span className="theme-toggle-thumb" />
-      </span>
+      <div className="theme-icon-wrapper">
+        <Sun 
+          className={`theme-sun ${effectiveTheme === "dark" ? "active" : "inactive"}`} 
+          size={20}
+          strokeWidth={1.5}
+        />
+        <Moon 
+          className={`theme-moon ${effectiveTheme === "light" ? "active" : "inactive"}`} 
+          size={20}
+          strokeWidth={1.5}
+        />
+      </div>
     </button>
   );
 }
