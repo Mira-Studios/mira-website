@@ -76,9 +76,6 @@ export default function Home() {
 
       <section className="section">
         <div className="container">
-          <h2 className="animate-fade-up" style={{ animationDelay: "120ms" }}>
-            Made To Be Customizable
-          </h2>
           <div className="feature-grid">
             {highlights.map((item, idx) => (
               <article
