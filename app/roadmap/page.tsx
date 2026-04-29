@@ -25,7 +25,7 @@ type RoadmapPlan = {
 
 const REPO_OWNER = "Mira-Studios";
 const REPO_NAME = "mira";
-const ROADMAP_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/ROADMAP.md`;
+const ROADMAP_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/apps/desktop/ROADMAP.md`;
 
 function parseSemver(value: string): ParsedSemver | null {
   const cleaned = value.trim().replace(/^v/i, "");

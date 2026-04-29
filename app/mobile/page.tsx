@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeHeroImage } from "./theme-hero-image";
+import { ThemeHeroImage } from ".././mobile-theme-hero-image";
 
 const highlights = [
   {
@@ -46,14 +46,14 @@ export default function Home() {
                   mira
                 </span>{" "}
                 <span style={{ position: "relative", top: "-8px" }}>
-                  is an open source desktop browser that helps you get everything done
+                  is an open source mobile browser that helps you get everything done
                 </span>
               </h1>
               <p className="muted-note animate-fade-up" style={{ animationDelay: "180ms", marginTop: "-0.7rem", marginBottom: "0.6rem" }}>
                 Mira is inspired by the Japanese word 未来 (mirai), meaning &quot;future.&quot;
               </p>
               <div className="cta-row animate-fade-up" style={{ animationDelay: "280ms" }}>
-                <Link href="/downloads" className="btn btn-primary">
+                <Link href="/downloads?platform=mobile" className="btn btn-primary">
                   Download Mira
                 </Link>
                 <a
@@ -63,18 +63,18 @@ export default function Home() {
                   rel="noreferrer"
                 >
                   View Source
-                </a>
+                </a>  
               </div>
-              <p className="muted-note animate-fade-up" style={{ animationDelay: "320ms", marginTop: "0.75rem", fontSize: "0.85rem", marginBottom: "1.25rem" }}>
+              <p className="muted-note animate-fade-up" style={{ animationDelay: "320ms", marginTop: "0.75rem", fontSize: "0.85rem" }}>
                 Looking for the{" "}
-                <Link href="/mobile" className="feature-card-link">
-                  mobile app
+                <Link href="/" className="feature-card-link">
+                  desktop app
                 </Link>
                 ?
               </p>
             </div>
             <div
-              className="hero-card hero-card--app animate-fade-in-scale"
+              className="hero-card hero-card--mobile animate-fade-in-scale"
               style={{ animationDelay: "210ms" }}
             >
               <ThemeHeroImage />

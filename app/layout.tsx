@@ -119,7 +119,6 @@ export default async function RootLayout({
                 <Link href="/roadmap">Roadmap</Link>
                 <Link href="/downloads">Downloads</Link>
                 <Link href="/themes">Themes</Link>
-                <Link href="/privacy">Privacy</Link>
                 <a href="https://github.com/Mira-Studios/mira" target="_blank" rel="noreferrer">
                     GitHub
                   </a>
@@ -130,6 +129,7 @@ export default async function RootLayout({
                   >
                     License
                   </a>
+                  <Link href="/privacy">Privacy</Link>
                   <Link href="/terms">Terms</Link>
               </nav>
             </div>

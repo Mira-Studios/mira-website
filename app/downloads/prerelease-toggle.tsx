@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useTransition } from "react";
 
 type PrereleaseToggleProps = {
   checked: boolean;
@@ -8,20 +9,25 @@ type PrereleaseToggleProps = {
 };
 
 export function PrereleaseToggle({
-  checked,
+  checked: serverChecked,
   disabled = false,
 }: PrereleaseToggleProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-  function handleToggle() {
-    if (disabled) {
+  // Derive checked state from URL to stay in sync
+  const urlChecked = searchParams.get("includePrereleases") === "1" || searchParams.get("includePrereleases") === "true";
+  const checked = isPending ? !serverChecked : (urlChecked || serverChecked);
+
+  const handleToggle = useCallback(() => {
+    if (disabled || isPending) {
       return;
     }
 
     const params = new URLSearchParams(searchParams.toString());
-    const nextChecked = !checked;
+    const nextChecked = !urlChecked;
 
     if (nextChecked) {
       params.set("includePrereleases", "1");
@@ -30,8 +36,10 @@ export function PrereleaseToggle({
     }
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
-  }
+    startTransition(() => {
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    });
+  }, [disabled, isPending, urlChecked, searchParams, pathname, router]);
 
   return (
     <button
@@ -40,8 +48,8 @@ export function PrereleaseToggle({
       aria-checked={checked}
       aria-label="Include pre-releases"
       onClick={handleToggle}
-      disabled={disabled}
-      className={`toggle-switch ${checked ? "on" : "off"} ${disabled ? "disabled" : ""}`}
+      disabled={disabled || isPending}
+      className={`toggle-switch ${checked ? "on" : "off"} ${disabled ? "disabled" : ""} ${isPending ? "pending" : ""}`}
     >
       <span className="toggle-slider" />
     </button>

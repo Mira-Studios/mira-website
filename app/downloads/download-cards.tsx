@@ -9,7 +9,7 @@ type SlotAsset = {
 
 type DownloadSlot = {
   label: string;
-  platform: "windows" | "mac-arm64" | "mac-x64" | "linux";
+  platform: "windows" | "mac-arm64" | "mac-x64" | "linux" | "android" | "ios";
   asset: SlotAsset | null;
 };
 
@@ -17,7 +17,7 @@ type DownloadCardsProps = {
   slots: DownloadSlot[];
 };
 
-type DetectedOS = "windows" | "mac-arm64" | "mac-x64" | "mac" | "linux" | "other" | "unknown";
+type DetectedOS = "windows" | "mac-arm64" | "mac-x64" | "mac" | "linux" | "android" | "ios" | "other" | "unknown";
 
 function normalizeArchitecture(value: string | undefined, allowX64 = true): "arm64" | "x64" | null {
   if (!value) {
@@ -68,6 +68,12 @@ async function detectOS(): Promise<DetectedOS> {
     }
     if (forced === "linux") {
       return "linux";
+    }
+    if (forced === "android") {
+      return "android";
+    }
+    if (forced === "ios" || forced === "iphone" || forced === "ipad") {
+      return "ios";
     }
   }
 
@@ -141,6 +147,12 @@ async function detectOS(): Promise<DetectedOS> {
   if (userAgent.includes("linux")) {
     return "linux";
   }
+  if (userAgent.includes("android")) {
+    return "android";
+  }
+  if (/iphone|ipad|ipod/.test(userAgent)) {
+    return "ios";
+  }
 
   return "other";
 }
@@ -182,6 +194,14 @@ function getRelevanceScore(slot: DownloadSlot, os: DetectedOS): number {
     return slot.platform === "linux" ? 0 : 2;
   }
 
+  if (os === "android") {
+    return slot.platform === "android" ? 0 : 2;
+  }
+
+  if (os === "ios") {
+    return slot.platform === "ios" ? 0 : 2;
+  }
+
   return 0;
 }
 
@@ -214,7 +234,9 @@ export function DownloadCards({ slots }: DownloadCardsProps) {
           os === "unknown" ||
           os === "other" ||
           (os === "mac" && (slot.platform === "mac-arm64" || slot.platform === "mac-x64")) ||
-          slot.platform === os;
+          slot.platform === os ||
+          (os === "android" && slot.platform === "android") ||
+          (os === "ios" && slot.platform === "ios");
         const animationClass = isApplicable ? "animate-fade-up" : "animate-fade-up-muted";
 
         return (

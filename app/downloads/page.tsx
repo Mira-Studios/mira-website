@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
 import { PrereleaseToggle } from "./prerelease-toggle";
 import { DownloadCards } from "./download-cards";
+import { StoreCards } from "./store-cards";
 import { getSiteUrl } from "@/lib/site-url";
 
 type ReleaseAsset = {
@@ -28,7 +31,7 @@ type GitHubRelease = {
 
 type DownloadSlot = {
   label: string;
-  platform: "windows" | "mac-arm64" | "mac-x64" | "linux";
+  platform: "windows" | "mac-arm64" | "mac-x64" | "linux" | "android" | "ios";
   asset: ReleaseAsset | null;
 };
 
@@ -115,6 +118,16 @@ function isLinuxAsset(name: string): boolean {
     lower.endsWith(".deb") ||
     lower.endsWith(".rpm")
   );
+}
+
+function isAndroidAsset(name: string): boolean {
+  const lower = name.toLowerCase();
+  return lower.endsWith(".apk") || lower.includes("android");
+}
+
+function isIOSAsset(name: string): boolean {
+  const lower = name.toLowerCase();
+  return lower.endsWith(".ipa") || lower.includes("ios") || lower.includes("iphone") || lower.includes("ipad");
 }
 
 function getMacAssetArchitecture(name: string): "arm64" | "x64" | "unknown" {
@@ -298,6 +311,74 @@ async function fetchReleases(): Promise<GitHubRelease[]> {
   return data.filter((release) => !release.draft);
 }
 
+async function fetchMobileReleases(): Promise<GitHubRelease[]> {
+  const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "mira-website",
+    },
+    next: { revalidate: 300 },
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as GitHubRelease[];
+  // Filter for mobile releases (tag_name starts with "mobile-v")
+  return data.filter((release) => !release.draft && /^mobile-v\d+\.\d+\.\d+/.test(release.tag_name));
+}
+
+function parseMobileSemver(tagName: string): ParsedSemver | null {
+  // Parse version from mobile-vX.X.X format
+  const match = tagName.match(/^mobile-v(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return null;
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3]),
+  };
+}
+
+function getLatestMobileRelease(releases: GitHubRelease[]): GitHubRelease | null {
+  let latest: GitHubRelease | null = null;
+  let latestSemver: ParsedSemver | null = null;
+
+  for (const release of releases) {
+    const semver = parseMobileSemver(release.tag_name);
+    if (!semver) continue;
+    if (!latestSemver || compareSemver(semver, latestSemver) > 0) {
+      latest = release;
+      latestSemver = semver;
+    }
+  }
+
+  return latest;
+}
+
+function buildMobileDownloadSlots(release: GitHubRelease): {
+  android: DownloadSlot;
+  ios: DownloadSlot;
+} {
+  const assets = release.assets.filter((asset) => isDownloadableAsset(asset.name));
+
+  const androidAssets = assets.filter((asset) => isAndroidAsset(asset.name));
+  const iosAssets = assets.filter((asset) => isIOSAsset(asset.name));
+
+  return {
+    android: {
+      label: "Android (.apk)",
+      platform: "android",
+      asset: chooseBestAsset(androidAssets, [".apk"]),
+    },
+    ios: {
+      label: "iOS (.ipa)",
+      platform: "ios",
+      asset: chooseBestAsset(iosAssets, [".ipa"]),
+    },
+  };
+}
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
     month: "long",
@@ -310,6 +391,17 @@ type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
+type PlatformType = "desktop" | "mobile" | "unknown";
+
+function getPlatformFromUserAgent(userAgent: string | null): PlatformType {
+  if (!userAgent) return "unknown";
+  const lower = userAgent.toLowerCase();
+  if (/android|iphone|ipad|ipod/.test(lower)) {
+    return "mobile";
+  }
+  return "desktop";
+}
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = (await searchParams) ?? {};
   const userIncludePrereleases = parseIncludePrereleases(resolvedSearchParams.includePrereleases);
@@ -317,16 +409,16 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const canonicalPath = "/downloads";
 
   return {
-    title: "Download Mira Browser for Windows, macOS, and Linux",
+    title: "Download Mira Browser for Windows, macOS, Linux, Android, and iOS",
     description:
-      "Download the latest Mira desktop browser builds for Windows, macOS, and Linux, with installer and portable options directly from official GitHub releases.",
+      "Download the latest Mira browser builds for Windows, macOS, Linux, Android, and iOS, directly from official GitHub releases.",
     alternates: {
       canonical: canonicalPath,
     },
     openGraph: {
-      title: "Download Mira Browser for Windows, macOS, and Linux",
+      title: "Download Mira Browser for Windows, macOS, Linux, Android, and iOS",
       description:
-        "Get official Mira downloads for Windows, macOS, and Linux, including installer and portable release assets.",
+        "Get official Mira downloads for Windows, macOS, Linux, Android, and iOS.",
       type: "website",
       url: canonicalPath,
       images: [
@@ -338,9 +430,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     },
     twitter: {
       card: "summary_large_image",
-      title: "Download Mira Browser for Windows, macOS, and Linux",
+      title: "Download Mira Browser for Windows, macOS, Linux, Android, and iOS",
       description:
-        "Get official Mira downloads for Windows, macOS, and Linux, including installer and portable release assets.",
+        "Get official Mira downloads for Windows, macOS, Linux, Android, and iOS.",
       images: ["/assets/mira_logo.png"],
     },
     robots: shouldNoindex ? { index: false, follow: true } : { index: true, follow: true },
@@ -351,26 +443,68 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
   const userIncludePrereleases = parseIncludePrereleases(resolvedSearchParams.includePrereleases);
 
-  const allReleases = await fetchReleases();
-  const stableReleases = allReleases.filter((release) => !release.prerelease);
+  // Detect platform from user-agent or query param override
+  const headersList = await headers();
+  const userAgent = headersList.get("user-agent") ?? null;
+  const platformOverride = resolvedSearchParams.platform as string | undefined;
+  let platform: PlatformType;
 
-  const hasStableLatest = stableReleases.length > 0;
-  const effectiveIncludePrereleases = userIncludePrereleases || !hasStableLatest;
+  if (platformOverride === "mobile") {
+    platform = "mobile";
+  } else if (platformOverride === "desktop") {
+    platform = "desktop";
+  } else {
+    platform = getPlatformFromUserAgent(userAgent);
+  }
 
-  const candidateReleases = effectiveIncludePrereleases ? allReleases : stableReleases;
-  const fallbackRelease = candidateReleases[0] ?? null;
-  const updateRelease = getLatestReleaseBySemver(candidateReleases) ?? fallbackRelease;
-  const selectedRelease = updateRelease ?? fallbackRelease;
+  let selectedRelease: GitHubRelease | null = null;
+  let slots: ReturnType<typeof buildDownloadSlots> | ReturnType<typeof buildMobileDownloadSlots> | null = null;
+  let isMobile = false;
+  let hasStableLatest = false;
+  let effectiveIncludePrereleases = userIncludePrereleases;
 
-  const slots = selectedRelease ? buildDownloadSlots(selectedRelease) : null;
+  // Track actual device type (for hiding toggle on mobile devices)
+  const deviceIsMobile = getPlatformFromUserAgent(userAgent) === "mobile";
+
+  if (platform === "mobile") {
+    // Fetch mobile releases
+    const mobileReleases = await fetchMobileReleases();
+    const mobileStableReleases = mobileReleases.filter((release) => !release.prerelease);
+    const hasMobileStable = mobileStableReleases.length > 0;
+    effectiveIncludePrereleases = userIncludePrereleases || !hasMobileStable;
+    const candidateMobileReleases = effectiveIncludePrereleases ? mobileReleases : mobileStableReleases;
+    const fallbackMobileRelease = candidateMobileReleases[0] ?? null;
+    const latestMobileRelease = getLatestMobileRelease(candidateMobileReleases) ?? fallbackMobileRelease;
+    selectedRelease = latestMobileRelease ?? fallbackMobileRelease;
+    if (selectedRelease) {
+      slots = buildMobileDownloadSlots(selectedRelease);
+    }
+    isMobile = true;
+    hasStableLatest = hasMobileStable;
+  } else {
+    // Fetch desktop releases (default)
+    const allReleases = await fetchReleases();
+    const stableReleases = allReleases.filter((release) => !release.prerelease);
+    hasStableLatest = stableReleases.length > 0;
+    effectiveIncludePrereleases = userIncludePrereleases || !hasStableLatest;
+    const candidateReleases = effectiveIncludePrereleases ? allReleases : stableReleases;
+    const fallbackRelease = candidateReleases[0] ?? null;
+    const updateRelease = getLatestReleaseBySemver(candidateReleases) ?? fallbackRelease;
+    selectedRelease = updateRelease ?? fallbackRelease;
+    if (selectedRelease) {
+      slots = buildDownloadSlots(selectedRelease);
+    }
+  }
+
   const siteUrl = getSiteUrl();
   const releaseName = selectedRelease?.name || selectedRelease?.tag_name || "Latest";
+  const operatingSystem = isMobile ? "Android, iOS" : "Windows, macOS, Linux";
   const softwareApplicationJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "Mira Browser",
     applicationCategory: "BrowserApplication",
-    operatingSystem: "Windows, macOS, Linux",
+    operatingSystem,
     softwareVersion: selectedRelease?.tag_name,
     releaseNotes: selectedRelease?.html_url,
     downloadUrl: `${siteUrl}/downloads`,
@@ -397,7 +531,38 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
         />
         <p className="lead">Release files are loaded directly from GitHub releases.</p>
 
-        <div className="toggle-row animate-fade-up" style={{ animationDelay: "180ms" }}>
+        {!deviceIsMobile && (
+          <div className="toggle-row animate-fade-up" style={{ animationDelay: "180ms" }}>
+            <span className="toggle-label">Platform</span>
+            <div className="platform-toggle">
+              <Link
+                href="/downloads?platform=desktop"
+                scroll={false}
+                className={`platform-btn ${!isMobile ? "active" : ""}`}
+              >
+                <svg className="platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                Desktop
+              </Link>
+              <Link
+                href="/downloads?platform=mobile"
+                scroll={false}
+                className={`platform-btn ${isMobile ? "active" : ""}`}
+              >
+                <svg className="platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="6" y="2" width="12" height="20" rx="2" />
+                  <line x1="12" y1="18" x2="12" y2="18.01" />
+                </svg>
+                Mobile
+              </Link>
+            </div>
+          </div>
+        )}
+
+        <div className="toggle-row animate-fade-up" style={{ animationDelay: "220ms" }}>
           <span className="toggle-label">Include pre-releases</span>
           <PrereleaseToggle
             checked={effectiveIncludePrereleases}
@@ -407,7 +572,7 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
 
         {!hasStableLatest && (
           <p className="muted-note animate-fade-up" style={{ animationDelay: "250ms" }}>
-            No stable latest release was found, so pre-releases are enabled automatically.
+            Latest Pre-release
           </p>
         )}
 
@@ -433,7 +598,10 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
 
             <div className="download-list">
               <DownloadCards
-                slots={[
+                slots={isMobile && "android" in slots ? [
+                  slots.android,
+                  slots.ios,
+                ] : !isMobile && "windowsInstaller" in slots ? [
                   slots.windowsInstaller,
                   slots.windowsPortable,
                   slots.macArm64Installer,
@@ -443,8 +611,11 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
                   slots.linuxAppImage,
                   slots.linuxDeb,
                   slots.linuxRpm,
-                ]}
+                ] : []}
               />
+              {isMobile && selectedRelease && (
+                <StoreCards currentVersion={selectedRelease.tag_name} />
+              )}
             </div>
           </>
         )}
