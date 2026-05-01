@@ -13,7 +13,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "Mira Browser",
-  description: "An open source desktop browser that helps you get everything done.",
+  description: "An open source browser that helps you get everything done.",
   keywords: [
     "FatalMistake02",
     "Fatal Mistake 02",
@@ -39,6 +39,15 @@ export const metadata: Metadata = {
     "ad blocker",
     "ad-blocker",
     "browser with ad blocker",
+    "privacy-focused browser",
+    "privacy browser",
+    "mobile browser",
+    "cross-platform browser",
+    "phone browser",
+    "iphone browser",
+    "android browser",
+    "tablet browser",
+    "ipad browser",
   ],
 };
 
