@@ -429,8 +429,8 @@ a {
   width: 100%;
   height: auto;
   display: block;
-  border: none;
-  border-radius: 1px;
+  border-radius: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
 }
 
 .theme-hero-image {
