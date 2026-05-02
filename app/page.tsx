@@ -3,6 +3,24 @@ import { ThemeHeroImage } from "./theme-hero-image";
 
 const highlights = [
   {
+    title: "Privacy By Default",
+    text: "Mira does not collect your data.",
+    href: "/privacy",
+    linkLabel: "Read privacy policy",
+  },
+  {
+    title: "Free",
+    text: "Mira is and will always be completely free!"
+  },
+  {
+    title: "Avoid Tracking",
+    text: "Mira comes with a built-in tracker blocker so you can browse the internet safely."
+  },
+  {
+    title: "Open Source",
+    text: "Open source development keeps Mira growing.",
+  },
+  {
     title: "Custom Themes",
     text: "Style Mira to match your setup with customizable theming.",
   },
@@ -10,28 +28,7 @@ const highlights = [
     title: "Custom Layouts",
     text: "Choose layouts that fit how you like to browse.",
   },
-  {
-    title: "Efficiency",
-    text: "Mira is designed to use memory efficiently during everyday browsing.",
-  },
-  {
-    title: "Built to Evolve",
-    text: "Open source development keeps Mira highly customizable over time.",
-  },
-  {
-    title: "Avoid Tracking",
-    text: "Mira comes with a built-in tracker blocker so you can browse the internet safely."
-  },
-  {
-    title: "Free",
-    text: "Mira is and will always be completely free!"
-  },
-  {
-    title: "Privacy By Default",
-    text: "Mira does not collect your personal data or usage analytics.",
-    href: "/privacy",
-    linkLabel: "Read privacy policy",
-  },
+  
 ];
 
 export default function Home() {
@@ -93,14 +90,12 @@ export default function Home() {
                 style={{ animationDelay: `${220 + idx * 120}ms` }}
               >
                 <h2>{item.title}</h2>
-                <p>{item.text}</p>
-                {"href" in item && item.href ? (
-                  <p>
-                    <Link href={item.href} className="feature-card-link">
-                      {item.linkLabel}
-                    </Link>
-                  </p>
-                ) : null}
+                <p>{item.text} {"href" in item && item.href ? (
+                  <Link href={item.href} className="feature-card-link">
+                    {item.linkLabel}
+                  </Link>
+                ) : null}</p>
+                
               </article>
             ))}
           </div>
