@@ -459,6 +459,12 @@ a {
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  .mobile-hero-image {
+    display: none !important;
+  }
+}
+
 .mobile-app-image {
   width: 100%;
   height: auto;
