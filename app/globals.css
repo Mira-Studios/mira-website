@@ -278,6 +278,35 @@ a {
   transform: scaleX(1);
 }
 
+/* Mobile links - hidden by default, shown on mobile */
+.mobile-links {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .mobile-links a {
+    color: var(--muted);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  /* Hide UpdateBanner on mobile to prevent layout issues */
+  .update-banner-compact {
+    display: none;
+  }
+}
+
 /* Theme Toggle - Smooth crossfade animation */
 .theme-icon-toggle {
   margin: 0;
@@ -292,6 +321,11 @@ a {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
@@ -319,8 +353,8 @@ a {
   position: absolute;
   top: 0;
   left: 0;
-  transition: 
-    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.35s ease;
 }
 
@@ -642,7 +676,12 @@ h2 {
   line-height: 1.2;
   text-decoration: none;
   color: var(--primary);
+  pointer-events: none;
   transition: background-color var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.update-banner-compact * {
+  pointer-events: auto;
 }
 
 .update-banner-compact:hover {

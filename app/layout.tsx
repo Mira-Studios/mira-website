@@ -85,6 +85,7 @@ export default async function RootLayout({
               "try{const t=localStorage.getItem('theme-preference');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;}}catch{}",
           }}
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="google-site-verification" content="RwpruDDKM5uiqVPr4VkMb4f6Luwz6vx1XXBqb2HebdQ" />
       </head>
       <body>
@@ -105,14 +106,20 @@ export default async function RootLayout({
                 <UpdateBanner latestVersion={latestVersion} settingsUrl="mira://Updates" compact />
               </div>
               <div className="nav-controls">
-                <nav className="nav-links" aria-label="Primary">
+                <nav className="nav-links desktop-only" aria-label="Primary">
                   {isAdmin && <Link href="/admin">Admin</Link>}
                   <Link href="/">Home</Link>
                   <Link href="/roadmap">Roadmap</Link>
                   <Link href="/downloads">Downloads</Link>
                   <Link href="/themes">Themes</Link>
                 </nav>
-                <ThemeToggle />
+                <nav className="mobile-links" aria-label="Mobile">
+                  <Link href="/roadmap">Roadmap</Link>
+                  <Link href="/downloads">Downloads</Link>
+                </nav>
+                <div className="desktop-only">
+                  <ThemeToggle />
+                </div>
                 <UserMenu initialUser={user} />
               </div>
             </div>
