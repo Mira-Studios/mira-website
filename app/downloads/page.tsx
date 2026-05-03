@@ -528,7 +528,6 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
         />
-        <p className="lead">Release files are loaded directly from GitHub releases.</p>
 
         {!deviceIsMobile && (
           <div className="toggle-row animate-fade-up" style={{ animationDelay: "180ms" }}>

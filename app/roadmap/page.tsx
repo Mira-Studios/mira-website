@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
 import { getSiteUrl } from "@/lib/site-url";
 
 type ParsedSemver = {
@@ -25,7 +27,19 @@ type RoadmapPlan = {
 
 const REPO_OWNER = "Mira-Studios";
 const REPO_NAME = "mira";
-const ROADMAP_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/apps/desktop/ROADMAP.md`;
+const DESKTOP_ROADMAP_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/apps/desktop/ROADMAP.md`;
+const MOBILE_ROADMAP_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/apps/mobile/ROADMAP.md`;
+
+type PlatformType = "desktop" | "mobile" | "unknown";
+
+function getPlatformFromUserAgent(userAgent: string | null): PlatformType {
+  if (!userAgent) return "unknown";
+  const lower = userAgent.toLowerCase();
+  if (/android|iphone|ipad|ipod/.test(lower)) {
+    return "mobile";
+  }
+  return "desktop";
+}
 
 function parseSemver(value: string): ParsedSemver | null {
   const cleaned = value.trim().replace(/^v/i, "");
@@ -59,14 +73,17 @@ function parseRoadmapMarkdown(markdown: string): RoadmapMilestone[] {
     if (headingMatch) {
       const heading = headingMatch[1].trim();
       const versionMatch = heading.match(/v?(\d+\.\d+\.\d+)\b/i);
-      const version = versionMatch ? parseSemver(versionMatch[1]) : null;
+      let version: ParsedSemver;
 
-      if (version) {
-        current = { heading, version, items: [] };
-        milestones.push(current);
+      if (versionMatch) {
+        version = parseSemver(versionMatch[1])!;
       } else {
-        current = null;
+        // For sections without versions (like "Anytime"), assign a low version so they appear at the top
+        version = { major: 0, minor: 0, patch: 1 };
       }
+
+      current = { heading, version, items: [] };
+      milestones.push(current);
       continue;
     }
 
@@ -82,9 +99,14 @@ function parseRoadmapMarkdown(markdown: string): RoadmapMilestone[] {
   return milestones;
 }
 
-async function fetchRoadmapMarkdown(): Promise<{ markdown: string; sourceUrl: string } | null> {
+async function fetchRoadmapMarkdown(platform: "desktop" | "mobile"): Promise<{ markdown: string; sourceUrl: string } | null> {
+  const roadmapPath = platform === "mobile" 
+    ? "apps/mobile/ROADMAP.md" 
+    : "apps/desktop/ROADMAP.md";
+  const roadmapUrl = platform === "mobile" ? MOBILE_ROADMAP_URL : DESKTOP_ROADMAP_URL;
+  
   const contentsResponse = await fetch(
-    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/ROADMAP.md?ref=main`,
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${roadmapPath}?ref=main`,
     {
       headers: {
         Accept: "application/vnd.github+json",
@@ -101,13 +123,13 @@ async function fetchRoadmapMarkdown(): Promise<{ markdown: string; sourceUrl: st
       if (decoded.trim().length > 0) {
         return {
           markdown: decoded,
-          sourceUrl: `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/ROADMAP.md`,
+          sourceUrl: `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/main/${roadmapPath}`,
         };
       }
     }
   }
 
-  const rawResponse = await fetch(ROADMAP_URL, {
+  const rawResponse = await fetch(roadmapUrl, {
     headers: {
       Accept: "text/plain",
       "User-Agent": "mira-website",
@@ -126,13 +148,13 @@ async function fetchRoadmapMarkdown(): Promise<{ markdown: string; sourceUrl: st
 
   return {
     markdown,
-    sourceUrl: ROADMAP_URL,
+    sourceUrl: roadmapUrl,
   };
 }
 
-async function fetchRoadmapPlan(): Promise<RoadmapPlan> {
+async function fetchRoadmapPlan(platform: "desktop" | "mobile"): Promise<RoadmapPlan> {
   try {
-    const roadmap = await fetchRoadmapMarkdown();
+    const roadmap = await fetchRoadmapMarkdown(platform);
     if (!roadmap) {
       return null;
     }
@@ -154,31 +176,81 @@ async function fetchRoadmapPlan(): Promise<RoadmapPlan> {
   }
 }
 
-export const metadata: Metadata = {
-  title: "Mira Roadmap",
-  description: "See the release roadmap for Mira by version with completion status.",
-  alternates: {
-    canonical: `${getSiteUrl()}/roadmap`,
-  },
+type PageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function RoadmapPage() {
-  const roadmapPlan = await fetchRoadmapPlan();
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await (searchParams ?? Promise.resolve({}));
+  const platform = String((params as Record<string, string | string[] | undefined>).platform || "desktop");
+  const isMobile = platform === "mobile";
+  
+  return {
+    title: isMobile ? "Mira Mobile Roadmap" : "Mira Roadmap",
+    description: isMobile 
+      ? "See the release roadmap for Mira Mobile by version with completion status."
+      : "See the release roadmap for Mira Desktop by version with completion status.",
+    alternates: {
+      canonical: `${getSiteUrl()}/roadmap`,
+    },
+  };
+}
+
+export default async function RoadmapPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await (searchParams ?? Promise.resolve({})) as Record<string, string | string[] | undefined>;
+  const headerList = await headers();
+  const userAgent = headerList.get("user-agent");
+  
+  const platformOverride = String(resolvedSearchParams.platform || "");
+  let platform: "desktop" | "mobile" = "desktop";
+  
+  if (platformOverride === "mobile") {
+    platform = "mobile";
+  } else if (platformOverride === "desktop") {
+    platform = "desktop";
+  } else {
+    const detected = getPlatformFromUserAgent(userAgent);
+    platform = detected === "mobile" ? "mobile" : "desktop";
+  }
+  
+  const isMobile = platform === "mobile";
+  const deviceIsMobile = getPlatformFromUserAgent(userAgent) === "mobile";
+  
+  const roadmapPlan = await fetchRoadmapPlan(platform);
 
   return (
     <main className="section page-enter">
       <div className="container narrow">
         <h1 className="animate-fade-up">Roadmap</h1>
-        <p className="lead">Planned work grouped by release version.</p>
 
-        {roadmapPlan?.sourceUrl && (
-          <div className="notice animate-fade-up" style={{ animationDelay: "180ms" }}>
-            <p>
-              Imported from:{" "}
-              <a href={roadmapPlan.sourceUrl} target="_blank" rel="noreferrer" className="roadmap-source-link">
-                ROADMAP.md on GitHub
-              </a>
-            </p>
+        {!deviceIsMobile && (
+          <div className="toggle-row animate-fade-up" style={{ animationDelay: "180ms" }}>
+            <span className="toggle-label">Platform</span>
+            <div className="platform-toggle">
+              <Link
+                href="/roadmap?platform=desktop"
+                scroll={false}
+                className={`platform-btn ${!isMobile ? "active" : ""}`}
+              >
+                <svg className="platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                Desktop
+              </Link>
+              <Link
+                href="/roadmap?platform=mobile"
+                scroll={false}
+                className={`platform-btn ${isMobile ? "active" : ""}`}
+              >
+                <svg className="platform-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="6" y="2" width="12" height="20" rx="2" />
+                  <line x1="12" y1="18" x2="12" y2="18.01" />
+                </svg>
+                Mobile
+              </Link>
+            </div>
           </div>
         )}
 
