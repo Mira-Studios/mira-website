@@ -2367,7 +2367,6 @@ code {
 .mira-top-bar {
   height: var(--layoutTopBarHeight, 38px);
   background: var(--surfaceBg, var(--tabBg));
-  border-bottom: 1px solid var(--surfaceBorder, var(--tabBorder));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2530,14 +2529,14 @@ code {
 }
 
 /* Address Bar */
-/* FIX: use urlBar variables instead of surface/tab hover */
+/* Match desktop app: surface hover bg with surface/tab border top */
 .mira-address-bar {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: var(--layoutAddressBarPaddingY, 6px);
-  background: var(--urlBarBg);
-  border-top: 1px solid var(--urlBarBorder);
+  background: var(--surfaceBgHover, var(--tabBgHover));
+  border-top: 1px solid var(--surfaceBorder, var(--tabBorder));
 }
 
 .mira-nav-buttons {
@@ -2572,10 +2571,6 @@ code {
   color: var(--navButtonTextActive);
 }
 
-.mira-nav-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
 
 .mira-url-container {
   position: relative;
@@ -2588,10 +2583,10 @@ code {
   width: 100%;
   height: var(--layoutNavButtonHeight, 30px);
   padding: 6px 40px 6px 12px;
-  background: var(--urlBarBg);
-  border: 1px solid var(--urlBarBorder);
+  background: var(--urlBarBg, var(--fieldBg));
+  border: 1px solid var(--urlBarBorder, var(--fieldBorder));
   border-radius: var(--layoutInputRadius, 6px);
-  color: var(--urlBarText);
+  color: var(--urlBarText, var(--fieldText));
   font-size: 14px;
   font-family: inherit;
   outline: none;
@@ -2599,13 +2594,13 @@ code {
 }
 
 .mira-url-input:hover {
-  background: var(--urlBarBgHover);
-  border-color: var(--urlBarBorderHover);
+  background: var(--urlBarBgHover, var(--fieldBgHover));
+  border-color: var(--urlBarBorderHover, var(--fieldBorderHover));
 }
 
 .mira-url-input:focus {
-  background: var(--urlBarBgActive);
-  border-color: var(--urlBarBorderActive);
+  background: var(--urlBarBgActive, var(--fieldBgActive));
+  border-color: var(--urlBarBorderActive, var(--fieldBorderActive));
 }
 
 .mira-bookmark-btn {
@@ -2653,6 +2648,28 @@ code {
   color: var(--navButtonTextHover);
 }
 
+/* Download Button */
+.mira-download-btn {
+  width: var(--layoutNavButtonHeight, 30px);
+  height: var(--layoutNavButtonHeight, 30px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navButtonBg);
+  border: 1px solid var(--navButtonBorder);
+  border-radius: 999px;
+  color: var(--navButtonText);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.mira-download-btn:hover {
+  background: var(--navButtonBgHover);
+  border-color: var(--navButtonBorderHover);
+  color: var(--navButtonTextHover);
+}
+
 /* Content Area */
 .mira-content {
   flex: 1;
@@ -2674,8 +2691,8 @@ code {
 
 .mira-logo-container {
   margin-bottom: 24px;
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2696,19 +2713,20 @@ code {
 }
 
 .mira-search-box {
-  width: 100%;
+  width: 60%;
   max-width: 600px;
+  min-width: 320px;
   margin: 28px 0 36px;
 }
 
 .mira-search-input {
   width: 100%;
-  padding: 12px 18px;
-  background: var(--urlBarBg);
-  border: 1px solid var(--urlBarBorder);
+  padding: 10px 15px;
+  background: var(--urlBarBg, var(--fieldBg));
+  border: 1px solid var(--urlBarBorder, var(--fieldBorder));
   border-radius: var(--layoutInputRadius, 6px);
-  color: var(--urlBarText);
-  font-size: 16px;
+  color: var(--urlBarText, var(--fieldText));
+  font-size: 18px;
   font-family: inherit;
   outline: none;
   transition: background-color 120ms ease, border-color 120ms ease;
@@ -2720,13 +2738,13 @@ code {
 }
 
 .mira-search-input:hover {
-  background: var(--urlBarBgHover);
-  border-color: var(--urlBarBorderHover);
+  background: var(--urlBarBgHover, var(--fieldBgHover));
+  border-color: var(--urlBarBorderHover, var(--fieldBorderHover));
 }
 
 .mira-search-input:focus {
-  background: var(--urlBarBgActive);
-  border-color: var(--urlBarBorderActive);
+  background: var(--urlBarBgActive, var(--fieldBgActive));
+  border-color: var(--urlBarBorderActive, var(--fieldBorderActive));
 }
 
 /* Quick Links Grid */
@@ -2826,6 +2844,11 @@ code {
 }
 
 .mini-preview .mira-menu-btn {
+  width: 22px;
+  height: 22px;
+}
+
+.mini-preview .mira-download-btn {
   width: 22px;
   height: 22px;
 }
