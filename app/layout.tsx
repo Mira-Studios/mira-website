@@ -6,13 +6,14 @@ import { ThemeToggle } from "./theme-toggle";
 import { UpdateBanner } from "./downloads/update-banner";
 import { getLatestVersion } from "./lib/latest-version";
 import { UserMenu } from "@/components/auth/user-menu";
+import { DynamicNav } from "@/components/navigation/dynamic-nav";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "Mira Browser",
+  title: "Mira Studios",
   description: "An open source desktop browser that helps you get everything done.",
   keywords: [
     "FatalMistake02",
@@ -39,6 +40,18 @@ export const metadata: Metadata = {
     "ad blocker",
     "ad-blocker",
     "browser with ad blocker",
+    "mira browser",
+    "mira office",
+    "mira documents",
+    "mira office suite",
+    "mira type",
+    "mira text editor",
+    "mira deck",
+    "mira presentation",
+    "mira slides",
+    "mira matrix",
+    "mira sheets",
+    "mira spreadsheet",
   ],
 };
 
@@ -96,13 +109,7 @@ export default async function RootLayout({
                 <UpdateBanner latestVersion={latestVersion} settingsUrl="mira://Updates" compact />
               </div>
               <div className="nav-controls">
-                <nav className="nav-links" aria-label="Primary">
-                  {isAdmin && <Link href="/admin">Admin</Link>}
-                  <Link href="/">Home</Link>
-                  <Link href="/roadmap">Roadmap</Link>
-                  <Link href="/downloads">Downloads</Link>
-                  <Link href="/themes">Themes</Link>
-                </nav>
+                <DynamicNav isAdmin={isAdmin} />
                 <ThemeToggle />
                 <UserMenu initialUser={user} />
               </div>
@@ -113,24 +120,117 @@ export default async function RootLayout({
 
           <footer className="site-footer">
             <div className="container nav-wrap footer-nav-wrap">
-              <p className="footer-brand">Mira Browser - MIT License - &copy; {year}</p>
-              <nav className="nav-links" aria-label="Footer">
-                <Link href="/">Home</Link>
-                <Link href="/roadmap">Roadmap</Link>
-                <Link href="/downloads">Downloads</Link>
-                <Link href="/themes">Themes</Link>
-                <a href="https://github.com/Mira-Studios/mira" target="_blank" rel="noreferrer">
-                    GitHub
-                  </a>
-                  <a
+              <div className="flex flex-col gap-1">
+                <Link href="/">
+                  <Image src="/assets/miraStudios.webp" alt="Mira" width={160} height={68} className="ml-[-7px] mb-[-4px]" />
+                </Link>
+                <div className="nav-links">
+                  <Link href="https://github.com/Mira-Studios" target="_blank" rel="noreferrer">GitHub</Link>
+                </div>
+                <div className="nav-links">
+                  <Link href="https://github.com/Mira-Studios/mira/blob/main/LICENSE" target="_blank" rel="noreferrer" >MIT License - &copy; {year}</Link>
+                </div>
+                <p className="text-[10px] text-[var(--text-secondary)]">
+                  Mira Studios and all associated names<br />and logos are All Rights Reserved.
+                </p>
+              </div>
+              <nav aria-label="Footer" className="flex flex-row gap-4">
+                <div className="flex flex-col gap-1 m-4">
+                  <div className="nav-links">
+                    <Link href="/browser" className="text-lg">Mira Browser</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/downloads">Downloads</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/roadmap">Roadmap</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/themes">Themes</Link>
+                  </div>
+                  <div className="nav-links">
+                    <a href="https://github.com/Mira-Studios/mira" target="_blank" rel="noreferrer">
+                      GitHub
+                    </a>
+                  </div>
+                  <div className="nav-links">
+                    <a
                     href="https://github.com/Mira-Studios/mira/blob/main/LICENSE"
                     target="_blank"
                     rel="noreferrer"
                   >
                     License
                   </a>
-                  <Link href="/privacy">Privacy</Link>
-                  <Link href="/terms">Terms</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/privacy">Privacy</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/terms">Terms</Link>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 m-4">
+                  <div className="nav-links">
+                    <Link href="/office" className="text-lg">miraOffice</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/office/downloads">Downloads</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/office/roadmap">Roadmap</Link>
+                  </div>
+                  <div className="nav-links">
+                    <a href="https://github.com/Mira-Studios/mira-office" target="_blank" rel="noreferrer">
+                      GitHub
+                    </a>
+                  </div>
+                  <div className="nav-links">
+                    <a
+                    href="https://github.com/Mira-Studios/mira-office/blob/main/LICENSE"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    License
+                  </a>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/privacy">Privacy</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/terms">Terms</Link>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1 m-4">
+                  <div className="nav-links">
+                    <Link href="/mail" className="text-lg">miraMail</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/mail/downloads">Downloads</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/mail/roadmap">Roadmap</Link>
+                  </div>
+                  <div className="nav-links">
+                    <a href="https://github.com/Mira-Studios/mira-mail" target="_blank" rel="noreferrer">
+                      GitHub
+                    </a>
+                  </div>
+                  <div className="nav-links">
+                    <a
+                      href="https://github.com/Mira-Studios/mira-mail/blob/main/LICENSE"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      License
+                    </a>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/privacy">Privacy</Link>
+                  </div>
+                  <div className="nav-links">
+                    <Link href="/terms">Terms</Link>
+                  </div>
+                </div>
               </nav>
             </div>
           </footer>

@@ -24,7 +24,7 @@ export default function PrivacyPage() {
 
           <div className="terms-section animate-fade-up" style={{ animationDelay: "300ms" }}>
             <div className="terms-section-header">
-              <h2>Mira Browser</h2>
+              <h2>Mira Products</h2>
             </div>
             <div className="privacy-columns">
               <section className="privacy-column">
@@ -54,13 +54,14 @@ export default function PrivacyPage() {
               <section className="privacy-column">
                 <h3>Account Data</h3>
                 <p>
-                  When you create an account, we store your email address and authentication credentials. This data is used solely for account management and is not shared with third parties.
+                  When you create an account, we store your email address and authentication credentials. This data is used solely for account management and is not used for any other purpose.
+                  We use supabase to store and handle this data.
                 </p>
               </section>
               <section className="privacy-column">
                 <h3>Themes</h3>
                 <p>
-                  Themes you upload are stored and made available to other users for download. Theme files may include metadata such as the theme name and author.
+                  Themes you upload are stored and made available to other users for download. If you do not want this data to be available to other users, do not upload it.
                 </p>
               </section>
             </div>

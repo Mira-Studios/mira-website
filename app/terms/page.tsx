@@ -56,7 +56,7 @@ export default function TermsPage() {
               <section className="privacy-column">
                 <h3>User Content</h3>
                 <p>
-                  By uploading themes, you grant us a license to host and distribute your content to other users. You retain ownership of your themes. Do not upload content that violates copyright or applicable laws.
+                  By uploading themes, you grant us a license to host and distribute your content to other users. You retain ownership of your themes. Do not upload content that violates copyright or other applicable laws.
                 </p>
               </section>
             </div>
@@ -72,7 +72,7 @@ export default function TermsPage() {
           <article className="feature-card animate-fade-up" style={{ animationDelay: "540ms" }}>
             <h2>Modifications</h2>
             <p>
-              We may update these terms occasionally. Continued use of Mira constitutes acceptance of any changes. The latest version will always be available at this URL.
+              We may update these terms occasionally. Continued use of Mira constitutes acceptance of any changes. The latest version will always be available here.
             </p>
           </article>
         </div>
