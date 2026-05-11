@@ -43,14 +43,9 @@ export function StoreCards({ currentVersion }: StoreCardsProps) {
               <p className="muted-note">Get the official app</p>
             </div>
           </div>
-          <a
-            href={store.storeUrl}
-            className="btn btn-primary store-btn"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Get App
-          </a>
+          <span className="btn btn-ghost store-btn" aria-disabled="true">
+            Coming Soon
+          </span>
         </article>
       ))}
     </>

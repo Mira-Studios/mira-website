@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ChevronLeft, ChevronRight, RotateCw, Bookmark, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCw, Bookmark, ChevronDown, Settings2, Download } from "lucide-react";
 import Image from "next/image";
 
 interface ThemePreviewProps {
@@ -146,6 +146,8 @@ export function ThemePreview({ cssContent }: ThemePreviewProps) {
     "--fontSecondaryWeight": fonts.fontSecondaryWeight || "300",
     "--fontPrimaryFallbackFamily": "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
     "--fontSecondaryFallbackFamily": "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+    "--fontPrimaryFamilyResolved": `${fonts.fontPrimaryFamily || "'Segoe UI'"}, 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif`,
+    "--fontSecondaryFamilyResolved": `${fonts.fontSecondaryFamily || "'Segoe UI'"}, 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif`,
   } as React.CSSProperties;
 
   const fontFamily = fonts.fontPrimaryFamily || "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif";
@@ -183,10 +185,10 @@ export function ThemePreview({ cssContent }: ThemePreviewProps) {
       <div className="mira-address-bar">
         {/* Navigation Buttons */}
         <div className="mira-nav-buttons">
-          <button className="mira-nav-btn" disabled>
+          <button className="mira-nav-btn">
             <ChevronLeft size={16} strokeWidth={2.1} />
           </button>
-          <button className="mira-nav-btn" disabled>
+          <button className="mira-nav-btn">
             <ChevronRight size={16} strokeWidth={2.1} />
           </button>
           <button className="mira-nav-btn">
@@ -221,18 +223,18 @@ export function ThemePreview({ cssContent }: ThemePreviewProps) {
         <div className="mira-newtab-content">
           {/* Logo */}
           <div className="mira-logo-container">
-            <Image 
-              src="/assets/mira_logo.png" 
-              alt="Mira logo" 
-              width={180} 
-              height={180}
+            <Image
+              src="/assets/mira_logo.png"
+              alt="Mira logo"
+              width={220}
+              height={220}
               className="mira-logo"
               priority
             />
           </div>
-          
+
           <h1 className="mira-title">Welcome to Mira</h1>
-          
+
           {/* Search Box */}
           <div className="mira-search-box">
             <input

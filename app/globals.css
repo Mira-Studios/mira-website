@@ -304,6 +304,35 @@ a {
   transform: scaleX(1);
 }
 
+/* Mobile links - hidden by default, shown on mobile */
+.mobile-links {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .mobile-links a {
+    color: var(--muted);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.875rem;
+  }
+
+  /* Hide UpdateBanner on mobile to prevent layout issues */
+  .update-banner-compact {
+    display: none;
+  }
+}
+
 /* Theme Toggle - Smooth crossfade animation */
 .theme-icon-toggle {
   margin: 0;
@@ -318,6 +347,11 @@ a {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease,
@@ -345,8 +379,8 @@ a {
   position: absolute;
   top: 0;
   left: 0;
-  transition: 
-    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.35s ease;
 }
 
@@ -451,12 +485,18 @@ a {
   margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+  .mobile-hero-image {
+    display: none !important;
+  }
+}
+
 .mobile-app-image {
   width: 100%;
   height: auto;
   display: block;
-  border: none;
-  border-radius: 1px;
+  border-radius: 40px;
+  border: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
 }
 
 .theme-hero-image {
@@ -668,7 +708,12 @@ h2 {
   line-height: 1.2;
   text-decoration: none;
   color: var(--primary);
+  pointer-events: none;
   transition: background-color var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.update-banner-compact * {
+  pointer-events: auto;
 }
 
 .update-banner-compact:hover {
@@ -1259,13 +1304,21 @@ code {
 
   .footer-nav-wrap {
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .footer-brand {
+    font-size: 0.8rem;
   }
 
   .site-footer .nav-links {
-    gap: 0.8rem 1rem;
-    font-size: 0.92rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+    font-size: 0.85rem;
   }
 
   .privacy-columns {
@@ -2340,7 +2393,6 @@ code {
 .mira-top-bar {
   height: var(--layoutTopBarHeight, 38px);
   background: var(--surfaceBg, var(--tabBg));
-  border-bottom: 1px solid var(--surfaceBorder, var(--tabBorder));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2503,14 +2555,14 @@ code {
 }
 
 /* Address Bar */
-/* FIX: use urlBar variables instead of surface/tab hover */
+/* Match desktop app: surface hover bg with surface/tab border top */
 .mira-address-bar {
   display: flex;
   align-items: center;
   gap: 4px;
   padding: var(--layoutAddressBarPaddingY, 6px);
-  background: var(--urlBarBg);
-  border-top: 1px solid var(--urlBarBorder);
+  background: var(--surfaceBgHover, var(--tabBgHover));
+  border-top: 1px solid var(--surfaceBorder, var(--tabBorder));
 }
 
 .mira-nav-buttons {
@@ -2545,10 +2597,6 @@ code {
   color: var(--navButtonTextActive);
 }
 
-.mira-nav-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
 
 .mira-url-container {
   position: relative;
@@ -2561,10 +2609,10 @@ code {
   width: 100%;
   height: var(--layoutNavButtonHeight, 30px);
   padding: 6px 40px 6px 12px;
-  background: var(--urlBarBg);
-  border: 1px solid var(--urlBarBorder);
+  background: var(--urlBarBg, var(--fieldBg));
+  border: 1px solid var(--urlBarBorder, var(--fieldBorder));
   border-radius: var(--layoutInputRadius, 6px);
-  color: var(--urlBarText);
+  color: var(--urlBarText, var(--fieldText));
   font-size: 14px;
   font-family: inherit;
   outline: none;
@@ -2572,13 +2620,13 @@ code {
 }
 
 .mira-url-input:hover {
-  background: var(--urlBarBgHover);
-  border-color: var(--urlBarBorderHover);
+  background: var(--urlBarBgHover, var(--fieldBgHover));
+  border-color: var(--urlBarBorderHover, var(--fieldBorderHover));
 }
 
 .mira-url-input:focus {
-  background: var(--urlBarBgActive);
-  border-color: var(--urlBarBorderActive);
+  background: var(--urlBarBgActive, var(--fieldBgActive));
+  border-color: var(--urlBarBorderActive, var(--fieldBorderActive));
 }
 
 .mira-bookmark-btn {
@@ -2626,6 +2674,28 @@ code {
   color: var(--navButtonTextHover);
 }
 
+/* Download Button */
+.mira-download-btn {
+  width: var(--layoutNavButtonHeight, 30px);
+  height: var(--layoutNavButtonHeight, 30px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navButtonBg);
+  border: 1px solid var(--navButtonBorder);
+  border-radius: 999px;
+  color: var(--navButtonText);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.mira-download-btn:hover {
+  background: var(--navButtonBgHover);
+  border-color: var(--navButtonBorderHover);
+  color: var(--navButtonTextHover);
+}
+
 /* Content Area */
 .mira-content {
   flex: 1;
@@ -2647,8 +2717,8 @@ code {
 
 .mira-logo-container {
   margin-bottom: 24px;
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2669,19 +2739,20 @@ code {
 }
 
 .mira-search-box {
-  width: 100%;
+  width: 60%;
   max-width: 600px;
+  min-width: 320px;
   margin: 28px 0 36px;
 }
 
 .mira-search-input {
   width: 100%;
-  padding: 12px 18px;
-  background: var(--urlBarBg);
-  border: 1px solid var(--urlBarBorder);
+  padding: 10px 15px;
+  background: var(--urlBarBg, var(--fieldBg));
+  border: 1px solid var(--urlBarBorder, var(--fieldBorder));
   border-radius: var(--layoutInputRadius, 6px);
-  color: var(--urlBarText);
-  font-size: 16px;
+  color: var(--urlBarText, var(--fieldText));
+  font-size: 18px;
   font-family: inherit;
   outline: none;
   transition: background-color 120ms ease, border-color 120ms ease;
@@ -2693,13 +2764,13 @@ code {
 }
 
 .mira-search-input:hover {
-  background: var(--urlBarBgHover);
-  border-color: var(--urlBarBorderHover);
+  background: var(--urlBarBgHover, var(--fieldBgHover));
+  border-color: var(--urlBarBorderHover, var(--fieldBorderHover));
 }
 
 .mira-search-input:focus {
-  background: var(--urlBarBgActive);
-  border-color: var(--urlBarBorderActive);
+  background: var(--urlBarBgActive, var(--fieldBgActive));
+  border-color: var(--urlBarBorderActive, var(--fieldBorderActive));
 }
 
 /* Quick Links Grid */
@@ -2799,6 +2870,11 @@ code {
 }
 
 .mini-preview .mira-menu-btn {
+  width: 22px;
+  height: 22px;
+}
+
+.mini-preview .mira-download-btn {
   width: 22px;
   height: 22px;
 }

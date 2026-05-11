@@ -15,6 +15,7 @@ type DownloadSlot = {
 
 type DownloadCardsProps = {
   slots: DownloadSlot[];
+  isMobile?: boolean;
 };
 
 type DetectedOS = "windows" | "mac-arm64" | "mac-x64" | "mac" | "linux" | "android" | "ios" | "other" | "unknown";
@@ -205,7 +206,7 @@ function getRelevanceScore(slot: DownloadSlot, os: DetectedOS): number {
   return 0;
 }
 
-export function DownloadCards({ slots }: DownloadCardsProps) {
+export function DownloadCards({ slots, isMobile = false }: DownloadCardsProps) {
   const [os, setOs] = useState<DetectedOS>("unknown");
 
   useEffect(() => {
@@ -230,13 +231,14 @@ export function DownloadCards({ slots }: DownloadCardsProps) {
   return (
     <>
       {orderedSlots.map((slot, idx) => {
-        const isApplicable =
+        const isApplicable = isMobile || (
           os === "unknown" ||
           os === "other" ||
           (os === "mac" && (slot.platform === "mac-arm64" || slot.platform === "mac-x64")) ||
           slot.platform === os ||
           (os === "android" && slot.platform === "android") ||
-          (os === "ios" && slot.platform === "ios");
+          (os === "ios" && slot.platform === "ios")
+        );
         const animationClass = isApplicable ? "animate-fade-up" : "animate-fade-up-muted";
 
         return (

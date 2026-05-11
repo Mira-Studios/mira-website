@@ -90,7 +90,7 @@ function getLatestReleaseBySemver(releases: GitHubRelease[]): GitHubRelease | nu
 
 function isDownloadableAsset(name: string): boolean {
   const lower = name.toLowerCase();
-  return [".exe", ".msi", ".dmg", ".pkg", ".zip", ".tar.gz", ".appimage", ".deb", ".rpm"].some((ext) =>
+  return [".exe", ".msi", ".dmg", ".pkg", ".zip", ".tar.gz", ".appimage", ".deb", ".rpm", ".apk", ".ipa"].some((ext) =>
     lower.endsWith(ext),
   );
 }
@@ -497,7 +497,6 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
   }
 
   const siteUrl = getSiteUrl();
-  const releaseName = selectedRelease?.name || selectedRelease?.tag_name || "Latest";
   const operatingSystem = isMobile ? "Android, iOS" : "Windows, macOS, Linux";
   const softwareApplicationJsonLd = {
     "@context": "https://schema.org",
@@ -529,7 +528,6 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationJsonLd) }}
         />
-        <p className="lead">Release files are loaded directly from GitHub releases.</p>
 
         {!deviceIsMobile && (
           <div className="toggle-row animate-fade-up" style={{ animationDelay: "180ms" }}>
@@ -577,30 +575,29 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
         )}
 
         {!selectedRelease && (
-          <div className="notice animate-fade-up" style={{ animationDelay: "300ms" }}>
+          <div key={`no-release-${platform}`} className="notice animate-fade-up" style={{ animationDelay: "300ms" }}>
             <p>No GitHub release is currently available.</p>
           </div>
         )}
 
         {selectedRelease && slots && (
           <>
-            <div className="notice animate-fade-up" style={{ animationDelay: "300ms" }}>
-              <p>
-                Showing <strong>{releaseName}</strong> ({selectedRelease.tag_name})
-                published on {formatDate(selectedRelease.published_at)}.
-              </p>
-              <p>
-                <a href={selectedRelease.html_url} target="_blank" rel="noreferrer">
-                  View release notes on GitHub
+            <div key={`version-${platform}`} className="notice animate-fade-up" style={{ animationDelay: "300ms" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+                <span>
+                  <strong>{selectedRelease.tag_name}</strong> • {formatDate(selectedRelease.published_at)}
+                </span>
+                <a href={selectedRelease.html_url} target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ padding: "0.25rem 0.75rem", fontSize: "0.875rem" }}>
+                  Release notes
                 </a>
-              </p>
+              </div>
             </div>
 
             <div className="download-list">
               <DownloadCards
+                isMobile={isMobile}
                 slots={isMobile && "android" in slots ? [
                   slots.android,
-                  slots.ios,
                 ] : !isMobile && "windowsInstaller" in slots ? [
                   slots.windowsInstaller,
                   slots.windowsPortable,
