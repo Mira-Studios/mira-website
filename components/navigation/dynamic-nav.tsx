@@ -101,7 +101,7 @@ export function DynamicNav({ isAdmin = false }: DynamicNavProps) {
 
   return (
     <nav
-      className="nav-links"
+      className="nav-links desktop-only"
       aria-label="Primary"
       style={{
         opacity,

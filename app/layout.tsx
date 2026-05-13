@@ -7,6 +7,7 @@ import { UpdateBanner } from "./downloads/update-banner";
 import { getLatestVersion } from "./lib/latest-version";
 import { UserMenu } from "@/components/auth/user-menu";
 import { DynamicNav } from "@/components/navigation/dynamic-nav";
+import { DynamicHeaderImage } from "@/components/header/dynamic-header-image";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
@@ -106,20 +107,15 @@ export default async function RootLayout({
           <header className="site-header">
             <div className="container nav-wrap">
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Link href="/" className="brand" aria-label="Mira home">
-                  <Image
-                    src="/assets/mira.png"
-                    alt="Mira"
-                    width={140}
-                    height={38}
-                    className="brand-image"
-                    priority
-                  />
-                </Link>
+                <DynamicHeaderImage />
                 <UpdateBanner latestVersion={latestVersion} settingsUrl="mira://Updates" compact />
               </div>
               <div className="nav-controls">
                 <DynamicNav isAdmin={isAdmin} />
+                <nav className="mobile-links" aria-label="Mobile">
+                  <Link href="/roadmap">Roadmap</Link>
+                  <Link href="/downloads">Downloads</Link>
+                </nav>
                 <ThemeToggle />
                 <UserMenu initialUser={user} />
               </div>
