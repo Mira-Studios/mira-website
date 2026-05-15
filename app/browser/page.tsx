@@ -63,8 +63,8 @@ export default function Home() {
   const frames = useRef<ImageBitmap[]>([]);
   const targetIdx = useRef(0);
   const displayIdx = useRef(0);
-  const rafRef = useRef<number>();
-
+// This allows the initial value to be null
+const rafRef = useRef<number | null>(null);
   // ─────────────────────────────────────────────────────────────
   // Hard lock page scroll until the intro animation fully finishes
   // ─────────────────────────────────────────────────────────────
