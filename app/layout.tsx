@@ -175,6 +175,7 @@ export default async function RootLayout({
                     <Link href="/terms">Terms</Link>
                   </div>
                 </div>
+                <span className="bg-[var(--muted)] h-[230px] w-[1px] self-center"></span>
                 <div className="flex flex-col gap-1 m-4">
                   <div className="nav-links">
                     <Link href="/office" className="text-lg">miraOffice</Link>
@@ -206,6 +207,7 @@ export default async function RootLayout({
                     <Link href="/terms">Terms</Link>
                   </div>
                 </div>
+                <span className="bg-[var(--muted)] h-[230px] w-[1px] self-center"></span>
                 <div className="flex flex-col gap-1 m-4">
                   <div className="nav-links">
                     <Link href="/mail" className="text-lg">miraMail</Link>
