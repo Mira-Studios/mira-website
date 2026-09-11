@@ -134,6 +134,9 @@ export default async function RootLayout({
                   <Link href="https://github.com/Mira-Studios" target="_blank" rel="noreferrer">GitHub</Link>
                 </div>
                 <div className="nav-links">
+                  <Link href="mailto:caleb.roche2.0@gmail.com" target="_blank" rel="noreferrer">Contact</Link>
+                </div>
+                <div className="nav-links">
                   <Link href="https://github.com/Mira-Studios/mira/blob/main/LICENSE" target="_blank" rel="noreferrer" >MIT License - &copy; {year}</Link>
                 </div>
                 <p className="text-[10px] text-[var(--text-secondary)]">
