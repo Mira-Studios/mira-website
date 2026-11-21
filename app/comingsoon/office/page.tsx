@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ThemeHeroImage } from "../office-hero-image";
+import { ThemeHeroImage } from "@/app/office-hero-image";
 
 const highlights = [
   {

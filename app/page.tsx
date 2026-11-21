@@ -1,39 +1,29 @@
 import Link from "next/link";
 import { ThemeHeroImage } from "./theme-hero-image";
+import { HomeScrollScene } from "@/components/home-scroll-scene";
+import { MoreFeaturesGallery } from "@/components/more-features-gallery";
 
 const highlights = [
-  {
-    title: "Privacy By Default",
-    text: "Mira does not collect your data.",
-    href: "/privacy",
-    linkLabel: "Read privacy policy",
-  },
-  {
-    title: "Free",
-    text: "Mira is and will always be completely free!"
-  },
-  {
-    title: "Avoid Tracking",
-    text: "Mira comes with a built-in tracker blocker so you can browse the internet safely."
-  },
-  {
-    title: "Open Source",
-    text: "Open source development keeps Mira growing.",
-  },
-  {
-    title: "Custom Themes",
-    text: "Style Mira to match your setup with customizable theming.",
-  },
-  {
-    title: "Custom Layouts",
-    text: "Choose layouts that fit how you like to browse.",
-  },
-  
+  { title: "Privacy", text: "Mira does not collect your data.", href: "/privacy", linkLabel: "Read privacy policy" },
+  { title: "Free", text: "Free to download and use." },
+  { title: "Ad blocking", text: "Block ads and trackers, including YouTube ads." },
+  { title: "Open source", text: "Read the code and contribute on GitHub." },
+  { title: "Custom colors", text: "Change any browser color." },
+  { title: "Layouts", text: "Choose your browser layout." },
+];
+
+const features = [
+  { title: "Private and open source.", label: "Privacy & open source",
+    text: "Mira does not collect your data. Its source code is public on GitHub.", href: "https://github.com/Mira-Studios/mira", link: "View source" },
+  { title: "Ad blocking, built in.", label: "Ad blocking",
+    text: "Block ads and trackers across the web, including video ads on YouTube." },
+  { title: "Change any color.", label: "Customization",
+    text: "Set every browser color, choose a layout, or start with a theme.", href: "/themes", link: "Browse themes" },
 ];
 
 export default function Home() {
   return (
-    <main className="page-enter">
+    <HomeScrollScene>
       <section className="hero">
         <div className="container">
           <div className="hero-stack">
@@ -71,36 +61,40 @@ export default function Home() {
               </p>
             </div>
             <div
-              className="hero-card hero-card--app animate-fade-in-scale"
-              style={{ animationDelay: "210ms" }}
+              className="hero-card hero-card--app"
             >
-              <ThemeHeroImage />
+              <ThemeHeroImage featureScreenshots />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="section">
+      <section className="section home-features" aria-label="Mira highlights">
         <div className="container">
-          <div className="feature-grid">
-            {highlights.map((item, idx) => (
-              <article
-                key={item.title}
-                className="feature-card animate-fade-up"
-                style={{ animationDelay: `${220 + idx * 120}ms` }}
-              >
+          <div className="home-highlight-grid">
+            {highlights.map((item, index) => (
+              <article key={item.title} className="home-highlight animate-fade-up" style={{ animationDelay: `${220 + index * 60}ms` }}>
                 <h2>{item.title}</h2>
-                <p>{item.text} {"href" in item && item.href ? (
-                  <Link href={item.href} className="feature-card-link">
-                    {item.linkLabel}
-                  </Link>
-                ) : null}</p>
-                
+                <p>{item.text}</p>
+                {item.href ? <Link href={item.href} className="home-highlight-link">Privacy policy</Link> : null}
               </article>
             ))}
           </div>
         </div>
       </section>
-    </main>
+      <section className="home-feature-story" aria-label="Explore Mira">
+        {features.map((feature, index) => (
+          <div className="home-feature-step" key={feature.label} data-side={index % 2 === 0 ? "left" : "right"}>
+            <article className="home-story-card">
+              <h2>{feature.title}</h2>
+              <p className="home-story-description">{feature.text}</p>
+              {feature.href ? <Link href={feature.href} className="home-story-link">{feature.link}</Link> : null}
+              {index === 0 ? <Link href="/privacy" className="home-story-link">Privacy policy</Link> : null}
+            </article>
+          </div>
+        ))}
+      </section>
+      <MoreFeaturesGallery />
+    </HomeScrollScene>
   );
 }
